@@ -49,12 +49,6 @@ linux-user-cli/
     * userdel
     * passwd
 
-Check Bash version:
-
-```bash
-bash --version
-```
-
 ## Installation & Usage
 
 Clone and run:
@@ -67,8 +61,8 @@ sudo ./user-cli.sh
 ```
 
 Notes:
+
 - Run with `sudo` (required by the script).
-- During creation, if `passwd` is canceled (for example with Ctrl+D), the user may be created without a password.
 
 ## Example
 
