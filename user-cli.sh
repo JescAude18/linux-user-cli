@@ -8,6 +8,14 @@
 ##
 
 echo -e "Welcome to the linux-user-cli project !\n"
+
+if [[ "EUID" -ne 0 ]]; then
+    echo -e "Launch the script with sudo or being root.\n"
+    exit 1
+fi
+
+for cmd in id useradd userdel passwd; do
+
 echo -e "Choose one option in the menu below.\n"
 
 while true; do
