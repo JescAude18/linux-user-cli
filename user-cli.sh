@@ -45,15 +45,32 @@ while true; do
             read y_n
             if [[ "${y_n,,}" == "yes" ]]; then
                 if id "$username">/dev/null 2>&1; then
-                    # userdel -r ${username}
-                    echo -e "Bye bye ${username} !\n"
+                    echo "Are you sure to delete the user ${username} with its directory ? Type yes or no."
+                    read -r sure
+                    if [[ "${sure,,}" == "yes" ]]; then
+                        # userdel -r ${username}
+                        echo -e "Bye bye ${username} !\n"
+                    elif [[ "${sure,,}" == "no" ]]; then
+                        echo -e "Ok, type another option in the menu.\n"
+                    else
+                        echo -e "Ok, type another option in the menu.\n"
+                    fi
                 else
                     echo -e "User ${username} doesn't exist. Type a valid user to delete.\n"
                 fi
             elif [[ "${y_n,,}" == "no" ]]; then
                 if id "$username">/dev/null 2>&1; then
                     # userdel ${username}
-                    echo -e "Bye bye ${username} !\n"
+                    echo "Are you sure to delete the user ${username} with its directory ? Type yes or no."
+                    read -r sure
+                    if [[ "${sure,,}" == "yes" ]]; then
+                        # userdel -r ${username}
+                        echo -e "Bye bye ${username} !\n"
+                    elif [[ "${sure,,}" == "no" ]]; then
+                        echo -e "Ok, type another option in the menu.\n"
+                    else
+                        echo -e "Ok, type another option in the menu.\n"
+                    fi
                 else
                     echo -e "User ${username} doesn't exist. Type a valid user to delete.\n"
                 fi
