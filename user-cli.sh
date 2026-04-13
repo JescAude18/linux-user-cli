@@ -9,7 +9,7 @@
 
 echo -e "Welcome to the linux-user-cli project !\n"
 
-if [[ "EUID" -ne 0 ]]; then
+if [[ "$EUID" -ne 0 ]]; then
     echo -e "Launch the script with sudo or being root.\n"
     exit 1
 fi
@@ -21,9 +21,8 @@ for cmd in id useradd userdel passwd; do
     fi
 done
 
-echo -e "Choose one option in the menu below.\n"
-
 while true; do
+    echo -e "Choose one option in the menu below.\n"
     echo "-----------------------------| MENU |------------------------------"
     echo "|                         1 - Create user                         |" 
     echo "|                         2 - Delete user                         |"
@@ -34,58 +33,63 @@ while true; do
     case "$option" in
         "1")
             echo "Enter the name of the user you want to create :"
-            read username
-            if id "$username">/dev/null 2>&1; then
-                    echo -e "User ${username} already exists. Retry.\n"
+            read -r username
+            if id "${username}" >/dev/null 2>&1; then
+                    echo -e "--> ERROR : User ${username} already exists. Retry.\n"
             else
-                echo "Enter its password :"
-                read -rs passw1
-                echo "Confirm the password :"
-                read -rs passw2
-                if [[ "$passw1" == "$passw2" ]]; then
-                    # useradd ${username}
-                    # passwd ${username}
-                    echo -e "--> COMPLETED : User ${username} created successfully !\n"
+                if useradd -m "${username}" >/dev/null 2>&1; then
+                    echo "Enter password for user ${username} :"
+                    if passwd "${username}"; then
+                        echo -e "--> COMPLETED : User ${username} created successfully !\n"
+                    else
+                        echo -e "--> ERROR : Password creation failed. User ${username} created without password.\
+                        Choose option 2 of the menu to delete the user.\n"
+                    fi
                 else
-                    echo -e "--> ERROR : Wrong password. Retry.\n"
+                    echo -e "--> ERROR : Failed to create user ${username}.\n"
                 fi
             fi
             ;;
         "2")
             echo "Enter the name of the user you want to delete :"
-            read username
-            if [[ "$username" == "root" ]]; then
+            read -r username
+            if [[ "${username}" == "root" ]]; then
                 echo -e "--> ERROR : Impossible to delete root.\n"
                 continue
-            elif [[ -n "${SUDO_USER:-}" && "$username" == "$SUDO_USER" ]]; then
+            elif [[ -n "${SUDO_USER:-}" && "${username}" == "$SUDO_USER" ]]; then
                 echo -e "--> ERROR : Impossible to delete current user.\n"
                 continue
             fi
             echo "--> WARNING : Do you want to delete the user's directory ? Type yes or no."
-            read y_n
+            read -r y_n
             if [[ "${y_n,,}" == "yes" ]]; then
-                if id "$username">/dev/null 2>&1; then
+                if id "${username}" >/dev/null 2>&1; then
                     echo "--> WARNING : Are you sure to delete the user ${username} with its directory ? Type yes or no."
                     read -r sure
                     if [[ "${sure,,}" == "yes" ]]; then
-                        # userdel -r ${username}
-                        echo -e "--> COMPLETED : Bye bye ${username} !\n"
+                        if userdel -r "${username}" >/dev/null 2>&1; then
+                            echo -e "--> COMPLETED : Bye bye ${username} !\n"
+                        else
+                            echo -e "Failed to delete user ${username} with its directory.\n"
+                        fi
                     elif [[ "${sure,,}" == "no" ]]; then
                         echo -e "--> INFO : Ok, type another option in the menu.\n"
                     else
                         echo -e "--> INFO : Ok, type another option in the menu.\n"
                     fi
                 else
-                    echo -e "--> COMPLETED : User ${username} doesn't exist. Type a valid user to delete.\n"
+                    echo -e "--> ERROR : User ${username} doesn't exist. Type a valid user to delete.\n"
                 fi
             elif [[ "${y_n,,}" == "no" ]]; then
-                if id "$username">/dev/null 2>&1; then
-                    # userdel ${username}
-                    echo "--> WARNING : Are you sure to delete the user ${username} with its directory ? Type yes or no."
+                if id "${username}" >/dev/null 2>&1; then
+                    echo "--> WARNING : Are you sure to delete the user ${username} ? Type yes or no."
                     read -r sure
                     if [[ "${sure,,}" == "yes" ]]; then
-                        # userdel -r ${username}
-                        echo -e "--> COMPLETED : Bye bye ${username} !\n"
+                        if userdel "${username}" >/dev/null 2>&1; then
+                            echo -e "--> COMPLETED : Bye bye ${username} !\n"
+                        else
+                            echo -e "Failed to delete user ${username}.\n"
+                        fi
                     elif [[ "${sure,,}" == "no" ]]; then
                         echo -e "--> INFO : Ok, type another option in the menu.\n"
                     else
@@ -100,8 +104,8 @@ while true; do
             ;;
         "3")
             echo "Enter the name of the user you want to check :"
-            read username
-            if id "$username">/dev/null 2>&1; then
+            read -r username
+            if id "${username}" >/dev/null 2>&1; then
                 echo -e "--> COMPLETED : User ${username} exists.\n"
             else
                 echo -e "--> COMPLETED : User ${username} doesn't exist.\n"
