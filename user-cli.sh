@@ -22,16 +22,20 @@ while true; do
         "1")
             echo "Enter the name of the user you want to create :"
             read username
-            echo "Enter its password :"
-            read -rs passw1
-            echo "Confirm the password :"
-            read -rs passw2
-            if [[ "$passw1" == "$passw2" ]]; then
-                # useradd ${username}
-                # passwd ${username}
-                echo -e "User ${username} created successfully !\n"
+            if id "$username">/dev/null 2>&1; then
+                    echo -e "User ${username} already exists. Retry.\n"
             else
-                echo -e "Wrong password. Retry.\n"
+                echo "Enter its password :"
+                read -rs passw1
+                echo "Confirm the password :"
+                read -rs passw2
+                if [[ "$passw1" == "$passw2" ]]; then
+                    # useradd ${username}
+                    # passwd ${username}
+                    echo -e "User ${username} created successfully !\n"
+                else
+                    echo -e "Wrong password. Retry.\n"
+                fi
             fi
             ;;
         "2")
