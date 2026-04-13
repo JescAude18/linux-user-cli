@@ -16,7 +16,7 @@ fi
 
 for cmd in id useradd userdel passwd; do
     if ! command -v "$cmd" >/dev/null; then
-        echo -e "Error : command '${cmd}' not found.\n" >&2
+        echo -e "--> Error : command '${cmd}' not found.\n" >&2
         exit 1
     fi
 done
@@ -45,67 +45,74 @@ while true; do
                 if [[ "$passw1" == "$passw2" ]]; then
                     # useradd ${username}
                     # passwd ${username}
-                    echo -e "User ${username} created successfully !\n"
+                    echo -e "--> COMPLETED : User ${username} created successfully !\n"
                 else
-                    echo -e "Wrong password. Retry.\n"
+                    echo -e "--> ERROR : Wrong password. Retry.\n"
                 fi
             fi
             ;;
         "2")
             echo "Enter the name of the user you want to delete :"
             read username
-            echo "Do you want to delete the user's directory ? Type yes or no."
+            if [[ "$username" == "root" ]]; then
+                echo -e "--> ERROR : Impossible to delete root.\n"
+                continue
+            elif [[ -n "${SUDO_USER:-}" && "$username" == "$SUDO_USER" ]]; then
+                echo -e "--> ERROR : Impossible to delete current user.\n"
+                continue
+            fi
+            echo "--> WARNING : Do you want to delete the user's directory ? Type yes or no."
             read y_n
             if [[ "${y_n,,}" == "yes" ]]; then
                 if id "$username">/dev/null 2>&1; then
-                    echo "Are you sure to delete the user ${username} with its directory ? Type yes or no."
+                    echo "--> WARNING : Are you sure to delete the user ${username} with its directory ? Type yes or no."
                     read -r sure
                     if [[ "${sure,,}" == "yes" ]]; then
                         # userdel -r ${username}
-                        echo -e "Bye bye ${username} !\n"
+                        echo -e "--> COMPLETED : Bye bye ${username} !\n"
                     elif [[ "${sure,,}" == "no" ]]; then
-                        echo -e "Ok, type another option in the menu.\n"
+                        echo -e "--> INFO : Ok, type another option in the menu.\n"
                     else
-                        echo -e "Ok, type another option in the menu.\n"
+                        echo -e "--> INFO : Ok, type another option in the menu.\n"
                     fi
                 else
-                    echo -e "User ${username} doesn't exist. Type a valid user to delete.\n"
+                    echo -e "--> COMPLETED : User ${username} doesn't exist. Type a valid user to delete.\n"
                 fi
             elif [[ "${y_n,,}" == "no" ]]; then
                 if id "$username">/dev/null 2>&1; then
                     # userdel ${username}
-                    echo "Are you sure to delete the user ${username} with its directory ? Type yes or no."
+                    echo "--> WARNING : Are you sure to delete the user ${username} with its directory ? Type yes or no."
                     read -r sure
                     if [[ "${sure,,}" == "yes" ]]; then
                         # userdel -r ${username}
-                        echo -e "Bye bye ${username} !\n"
+                        echo -e "--> COMPLETED : Bye bye ${username} !\n"
                     elif [[ "${sure,,}" == "no" ]]; then
-                        echo -e "Ok, type another option in the menu.\n"
+                        echo -e "--> INFO : Ok, type another option in the menu.\n"
                     else
-                        echo -e "Ok, type another option in the menu.\n"
+                        echo -e "--> INFO : Ok, type another option in the menu.\n"
                     fi
                 else
-                    echo -e "User ${username} doesn't exist. Type a valid user to delete.\n"
+                    echo -e "--> ERROR : User ${username} doesn't exist. Type a valid user to delete.\n"
                 fi
             else
-                echo -e "Type yes or no.\n"
+                echo -e "--> INFO : Type yes or no.\n"
             fi
             ;;
         "3")
             echo "Enter the name of the user you want to check :"
             read username
             if id "$username">/dev/null 2>&1; then
-                echo -e "User ${username} exists.\n"
+                echo -e "--> COMPLETED : User ${username} exists.\n"
             else
-                echo -e "User ${username} doesn't exist.\n"
+                echo -e "--> COMPLETED : User ${username} doesn't exist.\n"
             fi
             ;;
         "4")
-            echo -e "Bye bye ! Thanks to coming to the linux-user-cli projet 🥂\n"
+            echo -e "--> Bye bye ! Thanks to coming to the linux-user-cli projet 🥂\n"
             break
             ;;
         *)
-            echo -e "Type a valid value : 1, 2, 3 or 4\n"
+            echo -e "--> INFO : Type a valid value : 1, 2, 3 or 4\n"
             ;;
     esac
 done
