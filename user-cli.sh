@@ -15,6 +15,11 @@ if [[ "EUID" -ne 0 ]]; then
 fi
 
 for cmd in id useradd userdel passwd; do
+    if ! command -v "$cmd" >/dev/null; then
+        echo -e "Error : command '${cmd}' not found.\n" >&2
+        exit 1
+    fi
+done
 
 echo -e "Choose one option in the menu below.\n"
 
